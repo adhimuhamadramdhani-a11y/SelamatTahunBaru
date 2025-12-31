@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year Wupp!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0; 
+            padding: 0;
+            width: 100%; 
+            height: 100%;
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(to bottom, #000428, #004e92, #00d2ff);
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Dekorasi Bintang */
+        .stars { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 1; 
+            pointer-events: none; 
+        }
+        .star { 
+            position: absolute; 
+            background: white; 
+            border-radius: 50%; 
+            animation: twinkle var(--duration) infinite; 
+        }
+        @keyframes twinkle { 
+            0%, 100% { opacity: 0.3; } 
+            50% { opacity: 1; } 
+        }
+
+        /* Dekorasi Kembang Api */
+        .firework { 
+            position: absolute; 
+            width: 4px; 
+            height: 4px; 
+            border-radius: 50%; 
+            z-index: 2; 
+            animation: explode 2.5s infinite; 
+        }
+        @keyframes explode { 
+            0% { transform: translateY(100vh); opacity: 1; } 
+            50% { opacity: 1; } 
+            100% { transform: translateY(-30vh) scale(30); opacity: 0; } 
+        }
+
+        /* Container Utama Tengah */
+        .main-container {
+            position: absolute;
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 450px;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        #thumbnail { text-align: center; }
+        h1 { 
+            font-family: 'Pacifico', cursive; 
+            font-size: 2.5rem; 
+            text-shadow: 0 0 15px rgba(255,255,255,0.5); 
+        }
+        
+        .btn-main {
+            padding: 15px 40px; 
+            font-size: 1.2rem; 
+            font-weight: 600;
+            background: #ff4757; 
+            color: white; 
+            border: none; 
+            border-radius: 50px;
+            cursor: pointer; 
+            box-shadow: 0 5px 15px rgba(255,71,87,0.4);
+        }
+
+        /* Kotak Pesan */
+        #message-box {
+            display: none;
+            width: 100%;
+            height: 500px; /* Tinggi tetap agar tidak menciut */
+            background: #ffffff;
+            color: #2f3542;
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            border: 6px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .typing-text {
+            line-height: 1.6;
+            font-size: 1rem;
+            height: 380px;
+            overflow-y: auto;
+            text-align: justify;
+            word-wrap: break-word;
+            white-space: pre-line;
+        }
+
+        .btn-next {
+            position: absolute;
+            bottom: 20px; 
+            right: 25px;
+            padding: 10px 20px;
+            background: #2f3542; 
+            color: white;
+            border: none; 
+            border-radius: 10px;
+            font-weight: 600; 
+            cursor: pointer; 
+            display: none;
+        }
+
+        /* Video Area (VERTIKAL) */
+        #video-container {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+            justify-content: center; 
+            align-items: center;
+        }
+
+        video { 
+            width: auto; 
+            max-width: 85%; 
+            height: 85vh; /* Tinggi disesuaikan untuk video vertikal */
+            border-radius: 20px; 
+            box-shadow: 0 0 30px rgba(255,255,255,0.1);
+            background: black;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="lagutaunbaru1" loop><source src="lagutaunbaru1.mp3" type="audio/mpeg"></audio>
+
+    <div class="stars" id="stars-container"></div>
+    <div class="firework" style="left: 15%; background: gold;"></div>
+    <div class="firework" style="left: 80%; background: cyan; animation-delay: 1.2s;"></div>
+
+    <div class="main-container">
+        <div id="thumbnail">
+            <h1>Selamat tahun baruu🥳</h1>
+            <button class="btn-main" onclick="startStory()">klick</button>
+        </div>
+
+        <div id="message-box">
+            <div id="text-content" class="typing-text"></div>
+            <button id="btn-lanjut" class="btn-next" onclick="showFullMessage()">Lanjutkan</button>
+            <button id="btn-okey" class="btn-next" onclick="showVideo()">okeyy</button>
+        </div>
+    </div>
+
+    <div id="video-container">
+        <video id="video1" controls playsinline>
+            <source src="video1.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        // Logika Bintang
+        const starsContainer = document.getElementById('stars-container');
+        for (let i = 0; i < 60; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2 + 1 + 'px';
+            star.style.width = size; star.style.height = size;
+            star.style.top = Math.random() * 100 + '%'; star.style.left = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+            starsContainer.appendChild(star);
+        }
+
+        const msg1 = "Selamat tahun baru yaa wupp🥳";
+        const msg2 = "\n\njujur aku masih gak nyangka banget bisa nutup tahun ini dengan kehadiran kamu di hidup aku😅. ya walaupun kita baru bener bener bareng tuh sekitar 2 bulan, tapi entah kenapa aku ngerasa kita itu udah bareng lamaaa banget, entah karna emang saat bareng kamu aku happy, jadinya aku nikmatin setiap detik nya waktu kalo lagi barenh kamu jadi deh aku ngerasa waktu itu berjalan lambatt bangettt kalo lagi bareng kamu tuh. waktu kita bareng emang belum lama, tapi perasaan dan makna yang kamu bawa ke hidup aku itu berarti bangett.\n\ndalam waktu yang sebenernya singkat ini, aku ngerasain banyak hal yang buat aku seneng. aku ngerasa ditemenin, didengerin, dan pelan pelan belajar buat lebih peduli. kamu datang di hidup aku bukan di awal tahun, tapi justru di bagian akhir yang bikin aku nutup tahun ini dengan sesuatu yang berarti di hidup aku.\n\naku tau kita masih sama sama belajar, masih saling kenal, masih nyesuain diri, masih nemuin cara terbaik buat ngadepin perbedaan dan masalah. tapi yaa dari semua proses itu, aku bersyukur karna kamu ada dan mau jalan bareng sama aku sampe saat ini.\n\ndi tahun yang baru ini, aku gak mau buru buru, aku cuma pengen kita tumbuh pelan pelan, saling jujur, saling jaga, dan sama sama berusaha terus. semoga hubungan ini bukan cuma tentang rasa sayang di awal, tapi tentang komitmen buat bertahan dan berkembang bareng selamanya.\n\ntrimakasih yaa udah hadir di hidup aku, trimakasih juga usah jadi bagian yang ngebuat akhir tahun ku kali ini lebih berarti. dan semoga, di tahun depan, depan, depan, dan seterusnya sampe selamanya, aku bisa terus ngelewatin hari hari nanti bareng kamu, dan terus membuat cerita bersama ❤\n\nselamat tahun baru.\naku sayang kamu, dan ini baru awal dari perjalanan kita, masih banyak cerita dan tujuan yang harus kita capai bareng bareng. Okeyy wuppp???";
+
+        const audio = document.getElementById('lagutaunbaru1');
+
+        function startStory() {
+            audio.play();
+            document.getElementById('thumbnail').style.display = 'none';
+            document.getElementById('message-box').style.display = 'block';
+            typeWriter('text-content', msg1, () => {
+                document.getElementById('btn-lanjut').style.display = 'block';
+            });
+        }
+
+        function showFullMessage() {
+            document.getElementById('btn-lanjut').style.display = 'none';
+            typeWriter('text-content', msg1 + msg2, () => {
+                document.getElementById('btn-okey').style.display = 'block';
+            });
+        }
+
+        function typeWriter(id, text, callback) {
+            let container = document.getElementById(id);
+            let i = 0;
+            container.innerHTML = "";
+            function type() {
+                if (i < text.length) {
+                    container.innerHTML += text.charAt(i);
+                    i++;
+                    container.scrollTop = container.scrollHeight;
+                    setTimeout(type, 35);
+                } else if (callback) {
+                    callback();
+                }
+            }
+            type();
+        }
+
+        function showVideo() {
+            document.getElementById('video-container').style.display = 'flex';
+            audio.volume = 0.1;
+            document.getElementById('video1').play();
+        }
+    </script>
+</body>
+</html>
